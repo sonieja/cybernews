@@ -1,0 +1,118 @@
+# CyberNews – Project Summary
+
+**Individual project · Module 1 · Built with Flask, SQLite, Jinja2, CSS and JavaScript**
+
+## What my website does
+
+CyberNews is a website that puts cybersecurity news in one place. When you open it you see a dashboard
+with three featured stories, a grid of article cards, and a list of categories. You can search and filter
+the news by category, source and date, and the results change straight away without the page reloading.
+You can click any card to read the full article page.
+
+If you make an account, you can bookmark articles and find them again on "My bookmarks".
+If you are the admin, you also get an admin dashboard where you can add, edit and delete articles,
+import real headlines from The Hacker News RSS feed, read contact messages, and look at a login audit log.
+
+To be honest about the content: the 12 articles that come with the project are **sample stories I wrote
+myself** with made-up companies (Contoso, Northwind, Fabrikam). They have a yellow "Sample" badge, and the
+source links only go to the news sites' home pages. The real headlines come in with the RSS import button.
+
+## Main features
+
+- Page structure with header, navigation, main content and footer (one shared `base.html` layout)
+- News dashboard with featured stories and article cards
+- Categories, live search, and filters by source, date and category
+- Individual article pages
+- Dynamic content: JavaScript `fetch()` loads JSON from my Flask API (`/api/articles`)
+- Flask backend with about 20 routes
+- SQLite database with 5 tables: users, articles, bookmarks, login_audit, messages
+- Forms: register, login, add/edit article, contact
+- Login, logout and sessions
+- Two roles: **user** and **admin**, checked with my own `@admin_required` decorator
+- Bookmarks, login audit log, RSS import, contact messages
+- Works on phones (tested at 390 px wide)
+- 19 automatic tests with pytest, plus a curl security check script
+
+## Technologies
+
+| Part | What I used |
+|---|---|
+| Backend | Python 3, Flask 3 |
+| Templates | Jinja2 (comes with Flask) |
+| Database | SQLite with Python's built-in `sqlite3` module |
+| Security | Werkzeug password hashing, Flask-WTF CSRF protection |
+| Frontend | HTML, CSS (grid + flexbox + media queries), plain JavaScript (`fetch`) |
+| Extra | feedparser for The Hacker News RSS feed |
+| Testing | pytest, curl, headless Chrome for screenshots |
+| Version control | git |
+
+## Architecture
+
+![Architecture diagram](screenshots/00_architecture_diagram.png)
+
+```
+   FRONTEND (browser)            BACKEND (Flask)                 DATABASE (SQLite)
+ ┌──────────────────────┐     ┌──────────────────────────┐     ┌──────────────────┐
+ │ HTML from templates  │ --> │ routes in web_app.py     │ --> │ cybernews.db     │
+ │ style.css            │ HTTP│ sessions + roles         │ SQL │  users           │
+ │ app.js  (fetch)      │ <-- │ CSRF, hashing, checks    │ <-- │  articles        │
+ │ forms + csrf_token   │HTML/│ /api/articles -> JSON    │rows │  bookmarks       │
+ └──────────────────────┘JSON └──────────────────────────┘     │  login_audit     │
+                                                               │  messages        │
+                                                               └──────────────────┘
+```
+
+In simple words: the **browser** asks for a page. **Flask** finds the right route, checks who you are
+(session) and what you are allowed to do (role), asks the **database** for the data with a safe SQL query,
+and puts the data into a **template**. The browser gets HTML back. For live search, `app.js` asks for JSON
+instead of HTML and builds the cards itself.
+
+## Security measures
+
+- **Passwords are hashed** with `generate_password_hash`. Even I can't read them in the database.
+- **SQL injection:** every query uses `?` placeholders. Typing `' OR 1=1 --` in the search just finds 0 articles.
+- **XSS:** Jinja2 autoescapes everything, my JavaScript uses `textContent` instead of `innerHTML`,
+  and article links must start with `http://` or `https://` (so no `javascript:` links).
+- **CSRF:** Flask-WTF puts a secret token in every form. A POST without it gets 400.
+- **Roles:** normal users get **403 Forbidden** on every admin page, even if they type the address.
+- **Secret key** comes from the `SECRET_KEY` environment variable, not from the code.
+- **Session safety:** cookie is HttpOnly and SameSite=Lax, and the session is cleared on login.
+- **Login audit log** records successful logins, failed logins, logouts and new accounts.
+- Same error for "wrong username" and "wrong password", so nobody can find out which usernames exist.
+- Debug mode is off unless I switch it on, so the debugger can't be used by others.
+
+## What challenged me
+
+- **Sessions and roles.** Hiding the Admin link from normal users is easy, but I learned that hiding a link
+  is not security, because anyone can type `/admin` in the address bar. The real check has to be on the
+  server, so I wrote the `@admin_required` decorator and tested it with a normal account.
+- **CSRF tokens.** With CSRFProtect switched on, every POST form needs the hidden token, including small
+  ones like Log out, Bookmark and Delete. I also had to switch CSRF on in the right order, so the
+  "security check failed" page still shows who is logged in.
+- **Jinja macros.** My filter drop-downs were empty because imported macros don't see template variables
+  by default. I fixed it with `import ... with context`, and I added a test so it can't break again.
+- **JavaScript and safety together.** Building cards with `innerHTML` would have been shorter, but it would
+  have let a bad title run as code. I used `textContent` instead.
+
+## What I'm proud of
+
+- The live search: you type and the cards change instantly, and it still works without JavaScript.
+- The security tests: I tried SQL injection, XSS, missing CSRF tokens and a normal user on admin pages
+  on my own app, and every attack failed the way it should.
+- The audit log, because it shows a failed login in red, like a small version of what a SOC analyst looks at.
+- Keeping it honest: sample content is clearly labelled, and real news only comes from the RSS feed.
+
+## Next steps
+
+- Rate limiting / lock the account after many failed logins
+- Password reset and changing your own password
+- Comments or reactions on articles
+- Pagination when there are many articles
+- Deploy online with HTTPS (for example with gunicorn behind a web server)
+- Automatic RSS import every hour instead of a button
+
+## Links
+
+- Project repository: *(my GitHub link goes here)*
+- AI prototype screenshots: *(added separately)*
+- Final website screenshots: `screenshots/` folder
