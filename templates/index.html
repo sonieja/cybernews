@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_macros.html" import card, filters with context %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>Today in cybersecurity</h1>
+    <p>All the security headlines I follow, in one place. Search, filter by category, source or date, and save stories for later.</p>
+</section>
+
+<h2>Featured stories</h2>
+<div class="featured">
+    {% for a in featured %}
+    <article class="card feature">
+        <div class="meta">
+            <span class="badge cat">{{ a.category }}</span>
+            {% if a.is_sample %}<span class="badge sample">Sample</span>{% endif %}
+        </div>
+        <h3><a href="{{ url_for('article_detail', article_id=a.id) }}">{{ a.title }}</a></h3>
+        <p>{{ a.summary }}</p>
+        <p class="date">{{ a.source }} · {{ a.published_date }}</p>
+    </article>
+    {% endfor %}
+</div>
+
+<div class="layout">
+    <section class="col-main">
+        <h2>Latest news</h2>
+        {{ filters(sources) }}
+        {# app.js replaces what is inside this div when you type or pick a filter #}
+        <div id="article-list" class="grid">
+            {% for a in articles %}{{ card(a) }}{% endfor %}
+        </div>
+    </section>
+    <aside class="col-side">
+        <h2>Categories</h2>
+        <ul class="cat-list">
+            {% for c in counts %}
+            <li><a href="{{ url_for('news', category=c.category) }}">{{ c.category }}</a> <span>{{ c.n }}</span></li>
+            {% endfor %}
+        </ul>
+    </aside>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='app.js') }}"></script>{% endblock %}

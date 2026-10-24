@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "_macros.html" import card, filters with context %}
+{% block title %}All news{% endblock %}
+{% block content %}
+<h1>All news</h1>
+{{ filters(sources, q, category, source, date_from) }}
+<div id="article-list" class="grid">
+    {% for a in articles %}
+        {{ card(a) }}
+    {% else %}
+        <p class="muted">No articles match your search.</p>
+    {% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='app.js') }}"></script>{% endblock %}

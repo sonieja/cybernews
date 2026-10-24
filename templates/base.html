@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- This line makes the page fit phone screens -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CyberNews{% endblock %} | CyberNews</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a class="logo" href="{{ url_for('home') }}">Cyber<span>News</span></a>
+            <nav>
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('news') }}">All news</a>
+                {% if g.user %}
+                    <a href="{{ url_for('bookmarks') }}">My bookmarks</a>
+                    {% if g.user.role == 'admin' %}
+                        <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+                        <a href="{{ url_for('audit_log') }}">Audit log</a>
+                    {% endif %}
+                {% endif %}
+                <a href="{{ url_for('contact') }}">Contact</a>
+            </nav>
+            <div class="account">
+                {% if g.user %}
+                    <span class="who">{{ g.user.username }} <small>({{ g.user.role }})</small></span>
+                    <!-- Logout is a small POST form with a CSRF token, not a plain link -->
+                    <form action="{{ url_for('logout') }}" method="POST" class="inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn small ghost">Log out</button>
+                    </form>
+                {% else %}
+                    <a class="btn small ghost" href="{{ url_for('login') }}">Log in</a>
+                    <a class="btn small" href="{{ url_for('register') }}">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main>
+        {# Flash messages = one-time notes like "Article added." #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for cat, msg in messages %}
+                <div class="flash {{ cat }}">{{ msg }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>CyberNews &copy; {{ current_year }} · Student project · Articles marked
+           <span class="badge sample">Sample</span> are placeholder text I wrote for practice, not real news.</p>
+        <p>Read the real news at
+           <a href="https://thehackernews.com/" rel="noopener">The Hacker News</a> ·
+           <a href="https://www.securityweek.com/" rel="noopener">SecurityWeek</a> ·
+           <a href="https://www.bleepingcomputer.com/" rel="noopener">BleepingComputer</a></p>
+    </footer>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

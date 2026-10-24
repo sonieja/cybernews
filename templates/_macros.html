@@ -1,0 +1,30 @@
+{# One article card. Used on Home, All news and Bookmarks, so it looks the same everywhere. #}
+{% macro card(a) %}
+<article class="card">
+    <div class="meta">
+        <span class="badge cat">{{ a.category }}</span>
+        {% if a.is_sample %}<span class="badge sample">Sample</span>{% endif %}
+    </div>
+    <h3><a href="{{ url_for('article_detail', article_id=a.id) }}">{{ a.title }}</a></h3>
+    <p>{{ a.summary }}</p>
+    <p class="date">{{ a.source }} · {{ a.published_date }}</p>
+</article>
+{% endmacro %}
+
+{# The search + filter bar. Works as a normal GET form, and app.js makes it "live". #}
+{% macro filters(sources, q='', category='', source='', date_from='') %}
+<form id="filter-form" class="filters" action="{{ url_for('news') }}" method="GET" role="search">
+    <input type="search" name="q" id="q" value="{{ q }}" placeholder="Search headlines..." aria-label="Search">
+    <select name="category" id="category" aria-label="Category">
+        <option value="">All categories</option>
+        {% for c in categories %}<option value="{{ c }}" {% if c == category %}selected{% endif %}>{{ c }}</option>{% endfor %}
+    </select>
+    <select name="source" id="source" aria-label="Source">
+        <option value="">All sources</option>
+        {% for s in sources %}<option value="{{ s }}" {% if s == source %}selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select>
+    <label class="date-from">From <input type="date" name="date_from" id="date_from" value="{{ date_from }}"></label>
+    <button type="submit" class="btn">Filter</button>
+</form>
+<p id="result-count" class="muted" aria-live="polite"></p>
+{% endmacro %}

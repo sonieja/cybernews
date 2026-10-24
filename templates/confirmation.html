@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Thank you{% endblock %}
+{% block content %}
+<div class="form-box">
+    <h1>Thanks for reaching out, {{ name }}!</h1>
+    <p>Your message has been received and saved for the admin team.</p>
+    <p><a href="{{ url_for('home') }}">&larr; Back to the news</a></p>
+</div>
+{% endblock %}

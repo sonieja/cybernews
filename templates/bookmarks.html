@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% from "_macros.html" import card %}
+{% block title %}My bookmarks{% endblock %}
+{% block content %}
+<h1>My bookmarks</h1>
+<div class="grid">
+    {% for a in articles %}
+        {{ card(a) }}
+    {% else %}
+        <p class="muted">You have not saved any articles yet. Open an article and click "Bookmark this".</p>
+    {% endfor %}
+</div>
+{% endblock %}

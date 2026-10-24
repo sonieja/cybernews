@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Login audit log{% endblock %}
+{% block content %}
+<h1>Login audit log</h1>
+<p class="muted">Every login, failed login, logout and new registration (newest first, last 200). Only admins can see this page.</p>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Time</th><th>Username</th><th>Event</th><th>IP address</th><th>Browser</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+    <tr class="{{ 'bad' if r.event == 'login_failed' }}">
+        <td>{{ r.created_at }}</td>
+        <td>{{ r.username }}</td>
+        <td><span class="event {{ r.event }}">{{ r.event }}</span></td>
+        <td>{{ r.ip_address }}</td>
+        <td class="ua">{{ r.user_agent[:60] if r.user_agent }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">Nothing logged yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}
