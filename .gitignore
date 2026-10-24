@@ -1,0 +1,13 @@
+# Python virtual environment
+venv/
+.venv/
+# The SQLite database (it is created automatically with sample data)
+*.db
+# Secrets and local settings
+.env
+# Python cache files
+__pycache__/
+*.pyc
+.pytest_cache/
+# Logs
+*.log
