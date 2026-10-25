@@ -113,6 +113,6 @@ instead of HTML and builds the cards itself.
 
 ## Links
 
-- Project repository: *(my GitHub link goes here)*
+- Project repository: [github.com/sonieja/cybernews](https://github.com/sonieja/cybernews)
 - AI prototype screenshots: *(added separately)*
 - Final website screenshots: `screenshots/` folder
