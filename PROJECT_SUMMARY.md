@@ -81,6 +81,64 @@ instead of HTML and builds the cards itself.
 - Same error for "wrong username" and "wrong password", so nobody can find out which usernames exist.
 - Debug mode is off unless I switch it on, so the debugger can't be used by others.
 
+## My AI prototype vs. my Flask website
+
+Before building anything, I asked an AI website builder, **Lovable**, to make a CyberNews website.
+It called it **"CyberNews Pulse"**. It asked me no questions and made the whole thing in a few minutes.
+
+- Lovable project: https://lovable.dev/projects/dc6b9d38-b39a-40b0-9679-c08d98ac2cef
+- Preview: https://dc6b9d38-b39a-40b0-9679-c08d98ac2cef.lovableproject.com/
+- My 8 screenshots of it: `ai_prototype/` folder
+
+![AI prototype home page with the big featured story](ai_prototype/02_home_hero.png)
+
+### What the AI did better
+
+- **Looks.** Honestly, it looks more professional than mine: a dark charcoal background with a grid and a
+  soft glow, headlines that fade from green to yellow, neon green (#22c55e) and yellow (#facc15), and small
+  monospace tags. Funny thing: those are the same two colours I already used in my own style.css.
+- **Speed.** A full-looking site in minutes: header and nav, a big featured "top story", 9 article cards,
+  category chips and a search that really filter the cards, a "Trending" sidebar, an article page, a login
+  page called "Access terminal", an admin dashboard with stat cards and an edit/delete table, and a contact form.
+- **Ideas I can borrow.** The trending sidebar, category chips instead of a drop-down, and the bookmark icon on each card.
+
+### What my Flask website does that the prototype doesn't
+
+| Feature | AI prototype (Lovable) | My CyberNews (Flask) |
+|---|---|---|
+| Where data lives | Only in the browser, gone for other users | SQLite database on the server |
+| Login | Did not work in the preview | Real login with sessions |
+| Passwords | Ended up in the address bar | Hashed with Werkzeug, never stored or shown |
+| Admin page | Anyone can open `/admin` | `@admin_required` → normal users get **403** |
+| Add / edit / delete | Buttons are there (I did not test them) | Working, admin only, checked on the server |
+| CSRF protection | None that I could see | Token in every form, missing token → 400 |
+| Bookmarks | Only saved in this browser | Saved per user in the database |
+| Contact form | Sends nothing | Saved in the database, shown to the admin |
+| Audit log | No | Every login, failed login and logout |
+| Sample articles | Look like real news, not labelled | Marked "Sample", links only to home pages |
+| Tests | None | 19 pytest tests + curl security checks |
+
+### The security lessons I learned from it
+
+![AI prototype login page](ai_prototype/06_login_page.png)
+
+1. **Password in the URL.** When I pressed Sign in on the prototype's login page, the page reloaded and my
+   email **and password** appeared in the address bar (`?email=...&password=...`). This usually happens when a form has
+   no `method="POST"` and nothing handles it, so the browser sends it as GET. A URL is saved in the browser
+   history, in server logs and in proxy logs, and can be seen over someone's shoulder. That's why all my
+   login and register forms use `method="POST"`.
+2. **Unguarded admin page.** I could open the prototype's `/admin` without logging in at all (the nav still
+   says "Login" in my screenshot). Hiding a button is not security. My site checks the role **on the server** for
+   every admin route.
+3. **Pretty is not the same as safe.** The prototype looks finished, but it has no backend, so nothing a user
+   does is really saved or checked. If I only looked at the screenshots, I could think it was a real product.
+
+![AI prototype admin dashboard, opened without logging in](ai_prototype/07_admin_dashboard.png)
+
+**My conclusion:** the AI is great for a quick picture of the goal and for design ideas. But I could not
+explain or trust its security, and the important parts were missing. Building it myself in Flask was
+slower, but now everything works on a real server, and I can explain and test every line.
+
 ## What challenged me
 
 - **Sessions and roles.** Hiding the Admin link from normal users is easy, but I learned that hiding a link
@@ -114,5 +172,7 @@ instead of HTML and builds the cards itself.
 ## Links
 
 - Project repository: [github.com/sonieja/cybernews](https://github.com/sonieja/cybernews)
-- AI prototype screenshots: *(added separately)*
+- AI prototype (Lovable "CyberNews Pulse"): https://lovable.dev/projects/dc6b9d38-b39a-40b0-9679-c08d98ac2cef
+- AI prototype preview: https://dc6b9d38-b39a-40b0-9679-c08d98ac2cef.lovableproject.com/
+- AI prototype screenshots: `ai_prototype/` folder (8 pictures)
 - Final website screenshots: `screenshots/` folder

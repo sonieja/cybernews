@@ -11,6 +11,9 @@ Ex 4 POSTman: contact form) and now has a database, accounts, an admin area and 
 > The source names are real news sites, but the links only go to their **home pages**.
 > The admin can import real headlines from The Hacker News RSS feed.
 
+> 🤖 **AI prototype:** before building this, I generated a prototype with Lovable ("CyberNews Pulse").
+> Screenshots are in [`ai_prototype/`](ai_prototype/), and the comparison is in [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md).
+
 ## Features
 
 - Header, navigation, main content and footer on every page (one shared `base.html` layout)
